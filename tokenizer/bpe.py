@@ -1,8 +1,20 @@
 import regex as re
+import unicodedata
 
 class BytePairTokenizer:
     def __init__(self):
-        pass
+         self.cleaner_agent = re.compile(
+            r"""'s|'t|'re|'ve|'m|'ll|'d
+            | ?\p{L}+
+            | ?\p{N}+
+            | ?[^\s\p{L}\p{N}]+
+            |\s+(?!\S)
+            |\s+
+            """,
+            re.VERBOSE | re.IGNORECASE
+        )
+         
+         #it is unecessary to have complex BPE rules for this example
 
     def words_to_bytes(self, text):
         # Convert text to bytes
@@ -10,6 +22,19 @@ class BytePairTokenizer:
         # Convert bytes to list of integers
         tokens = list(map(int, byte_sequence))
         return tokens
+    
+    def text_to_bytes(self, text):
+        # Normalize text to NFKC form like é to e +  ́
+        text =unicodedata.normalize("NFKC", text)
+
+        # Use regex to find words and punctuation
+        words = self.cleaner_agent.findall(text)
+
+        # Convert each word to bytes and flatten the list
+        byte_tokens = []
+        for word in words:
+            byte_tokens.extend(self.words_to_bytes(word))
+        return byte_tokens
     
     #Given a list of byte tokens , merge adjacent byte tokens based on BPE rules(common pairs)
     def  merge_tokens(self ,tokens):
