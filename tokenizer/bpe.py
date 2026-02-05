@@ -51,6 +51,8 @@ class BytePairTokenizer:
         return merged_tokens
 
     #i have learned the i need to make sure that i dont have tokens of dog. and dog! 
+   
+
 
     #create a dictionary of byte pairs and their frequencies
     def bytes_pair(self ,tokens):
@@ -61,6 +63,47 @@ class BytePairTokenizer:
                   pairs[pair] += 1
               else:
                   pairs[pair] = 1
-          return pairs         
+          return pairs   
+    
+    def replace_most_common(ids , pairs ,idx_to_token):  
+        """Finds the most common byte pair in the list of tokens."""
+        new_tokens = []
+        i = 0
+        while i < len(ids):
+            if i < len(ids) - 1 and  ids[i] == pairs[0] and ids[i + 1] == pairs[1]:
+                new_tokens.append(idx_to_token)
+                i += 2  # Skip the next token as it's merged
+            else:
+                new_tokens.append(ids[i])
+                i += 1
+        return new_tokens
+
+    def encode_text(self ,text , merges):
+        """Encodes the input text using the BPE merges."""
+        byte_tokens = list(map(int, text.encode('utf-8')))
+        for pair, idx in merges.items():
+            byte_tokens = self.replace_most_common(byte_tokens, pair, idx)
+        return byte_tokens
+    
+
+    def decode_tokens(tokens, merges):
+        """Decodes the list of token ids back to text using the BPE merges."""
+        reverse_merges = {idx: pair for pair, idx in merges.items()}
+
+        def expand(token):
+            # If token is a merged id, expand recursively
+            if token in reverse_merges:
+                left, right = reverse_merges[token]
+                return expand(left) + expand(right)
+            else:
+                return [token]
+
+        decoded_tokens = []
+        for token in tokens:
+            decoded_tokens.extend(expand(token))
+
+        # Now all tokens are <256, safe for bytes()
+        byte_sequence = bytes(decoded_tokens)
+        return byte_sequence.decode('utf-8', errors='ignore')      
     
 
