@@ -3,9 +3,15 @@
 LLM
 ├─ configs
 ├─ data
-│  ├─ simple.txt
-│  ├─ taylorswift.txt
-│  └─ tiny-shakespeare.txt
+│  ├─ cleaned
+│  ├─ dataloader.py
+│  ├─ dataset.py
+│  ├─ raw
+│  │  ├─ simple.txt
+│  │  ├─ taylorswift.txt
+│  │  └─ tiny-shakespeare.txt
+│  ├─ scripts
+│  └─ splits
 ├─ experiments
 ├─ inference
 ├─ model

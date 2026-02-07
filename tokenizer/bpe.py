@@ -8,15 +8,17 @@ class BPETokenizer:
     def __init__(self):
         self.merges = {}
         self.cleaner_agent = re.compile(
-            r"""'s|'t|'re|'ve|'m|'ll|'d
-            | ?\p{L}+
-            | ?\p{N}+
-            | ?[^\s\p{L}\p{N}]+
-            |\s+(?!\S)
-            |\s+
+            r"""
+            (?:'s|'t|'re|'ve|'m|'ll|'d)
+            |(?:\s?\p{L}+)
+            |(?:\s?\p{N}+)
+            |(?:\s?[^\s\p{L}\p{N}]+)
+            |(?:\s+(?!\S))
+            |(?:\s+)
             """,
             re.VERBOSE | re.IGNORECASE
-        )  
+        )
+
 
     # ---------------- TRAIN ----------------
     def train(self, text, vocab_size, verbose=False):

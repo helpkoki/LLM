@@ -1,0 +1,7 @@
+{
+  "source": "taylorswift.txt",
+  "encoding": "utf-8",
+  "cleaning": "regex_v1",
+  "tokenizer": "bpe_10k",
+  "created_at": "2026-02-07"
+}
