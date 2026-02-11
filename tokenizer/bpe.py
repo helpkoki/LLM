@@ -167,3 +167,43 @@ class BPETokenizer:
     def document_to_string(self, document):
         with open(document, "r", encoding="utf-8") as file:
             return file.read()
+
+     def continue_training(self, new_text, new_vocab_size, verbose=False):
+        """
+        Continue training BPE on new_text, preserving existing merges.
+        new_vocab_size: total desired vocab size after increment.
+        """
+        # Start with existing tokens from previous merges
+        pre_bytes = new_text.encode("utf-8")
+        byte_tokens = list(map(int, pre_bytes))
+
+        ids = list(byte_tokens)
+
+        # Calculate how many new merges to make
+        current_vocab_size = 256 + len(self.merges)
+        num_new_merges = new_vocab_size - current_vocab_size
+        if num_new_merges <= 0:
+            if verbose:
+                print("No new merges required; desired vocab size already reached.")
+            return ids, self.merges
+
+        for i in range(num_new_merges):
+            pairs = self.get_pairs(ids)
+            if not pairs:
+                break
+
+            # Remove pairs that already exist in merges
+            pairs = {pair: count for pair, count in pairs.items() if pair not in self.merges}
+            if not pairs:
+                break
+
+            pair = max(pairs, key=pairs.get)
+            idx = current_vocab_size + i
+            ids = self.replace_most_common(ids, pair, idx)
+
+            if verbose:
+                print(f"New merge {pair} -> {idx}")
+
+            self.merges[pair] = idx
+
+        return ids, self.merges
