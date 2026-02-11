@@ -17,6 +17,8 @@ class SimpleSelfAttention:
           V = np.dot(x, self.W_v)
 
           scores = np.matmul(Q, K.transpose(0, 2, 1)) / np.sqrt(self.embed_dim)
+          mask = np.triu(np.ones((seq_len, seq_len)), k=1).astype(bool)
+          scores[:, mask] = -1e9
           attention_weights = self._softmax(scores)
           output = np.matmul(attention_weights, V)
 
